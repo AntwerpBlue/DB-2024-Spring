@@ -8,9 +8,10 @@ export async function POST(req: Request) {
     const conn = await pool.getConnection();
     try {
         const { id, name, source, startYear, endYear, totalFunding, participants, type } = await req.json();
-        console.log(`Received paper data: ${{ id, name, source, startYear, endYear, totalFunding, participants, type }}`);
-        const totalamount=participants.reduce((sum:number, part:Part)=> sum + part.amount,0);
-        if(totalamount!==totalFunding){
+        console.log(`Received data: ${id}, ${name}, ${source}, ${startYear}, ${endYear}, ${totalFunding}, ${participants}, ${type}`);
+        const totalamount=participants.reduce((sum:number, part:Part)=> sum +Number(part.amount),0);
+        console.log(`Total amount: ${totalamount}`);
+        if(totalamount!=totalFunding){
             return NextResponse.json({message:"经费金额不匹配"},{status:400});
         }
         interface PartsResult extends RowDataPacket {

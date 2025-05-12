@@ -31,4 +31,17 @@ export interface ApiResponse {
     success: boolean;
     message?: string;
     data?: any;
-  }
+}
+export interface Teach{
+    name: string;
+    time: number;
+}
+export interface Course{
+    id: string;
+    name: string;
+    type: string;
+    duration: number;
+    teachers: Teach[];
+    year: number;
+    semester: number;
+}
