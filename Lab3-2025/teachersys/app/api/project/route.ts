@@ -1,6 +1,7 @@
 import { connectToDB } from '@/app/lib/db';
 import { NextResponse } from 'next/server';
 import { RowDataPacket } from 'mysql2';
+import { Part, Project } from '@/app/lib/types';
 
 export async function POST(req: Request) {
     const pool = await connectToDB();
@@ -8,46 +9,42 @@ export async function POST(req: Request) {
     try {
         const { id, name, source, startYear, endYear, totalFunding, participants, type } = await req.json();
         console.log(`Received paper data: ${{ id, name, source, startYear, endYear, totalFunding, participants, type }}`);
-        const placeholders = authors.map(() => '?').join(',');
-        interface AuthorResult extends RowDataPacket {
+        const totalamount=participants.reduce((sum:number, part:Part)=> sum + part.amount,0);
+        if(totalamount!==totalFunding){
+            return NextResponse.json({message:"经费金额不匹配"},{status:400});
+        }
+        interface PartsResult extends RowDataPacket {
             name: string | null;
         }
-        console.log(`Placeholders: ${placeholders}`);
-        const [names] = await conn.query<AuthorResult[]>(
+        const parts=(participants as Part[]).map(part=>part.name);
+        const [names] = await conn.query<PartsResult[]>(
             `SELECT 姓名 AS name FROM teacher WHERE 姓名 IN (?)`,
-            [authors]
+            [parts]
         );
         console.log(names[0])
         console.log(`Names: ${names.map(row => row.name).join(', ')}`);
         const existingNames = new Set(names.map(row => row.name));
-        const missingAuthors = (authors as string[]).filter(name => !existingNames.has(name));
-        if (missingAuthors.length > 0) {
-            console.log(`Missing authors: ${missingAuthors.join(', ')}`);
+        const missingNames = (parts as string[]).filter(name => !existingNames.has(name));
+        if (missingNames.length > 0) {
+            console.log(`Missing participants: ${missingNames.join(', ')}`);
             return NextResponse.json(
-                { message: `The following authors do not exist: ${missingAuthors.join(', ')}` },
+                { message: `The following participants do not exist: ${missingNames.join(', ')}` },
                 { status: 400 }
             );
         }
         // 数据库事务
         await conn.beginTransaction();
-        interface MaxIdResult extends RowDataPacket {
-            max_id: number | null;
-        }
-        const [rows] = await conn.query<MaxIdResult[]>('SELECT MAX(序号) as max_id FROM paper');
-        const maxId = rows[0].max_id || 0;
-        // 插入论文
         await conn.query(
-        'INSERT INTO paper VALUES (?,?,?,?,?,?)',
-        [String(maxId+1), title, source, publishYear, type, level]
+            'INSERT INTO project VALUES (?,?,?,?,?,?,?)',
+            [id, name, source, type, totalFunding, startYear, endYear]
         );
-        (authors as String[]).forEach(async (author,index) => {
+        (participants as Part[]).forEach(async (part,index) => {
             interface AuthorIdResult extends RowDataPacket {
                 id: number | null;
             }
-            const [authorIdRows] = await conn.query<AuthorIdResult[]>('SELECT 工号 AS id FROM teacher WHERE 姓名 = ?', author);
+            const [authorIdRows] = await conn.query<AuthorIdResult[]>('SELECT 工号 AS id FROM teacher WHERE 姓名 = ?', part.name);
             const authorId = authorIdRows[0].id;
-            const corres=index===correspondingAuthorIndex?1:0;
-            conn.query('INSERT INTO publishment VALUES (?,?,?,?)',[authorId, String(maxId+1), String(index+1), corres])
+            conn.query('INSERT INTO participation VALUES (?,?,?,?)',[authorId, id, part.amount, index+1])
         })
         await conn.commit();
         return NextResponse.json({ success: true });

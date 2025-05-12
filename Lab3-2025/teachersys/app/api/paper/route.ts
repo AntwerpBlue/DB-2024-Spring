@@ -8,11 +8,9 @@ export async function POST(req: Request) {
     try {
         const { title, source, publishYear, type, level, authors, correspondingAuthorIndex } = await req.json();
         console.log(`Received paper data: ${title}, ${source}, ${publishYear}, ${type}, ${level}, ${authors}, ${correspondingAuthorIndex}`);
-        const placeholders = authors.map(() => '?').join(',');
         interface AuthorResult extends RowDataPacket {
             name: string | null;
         }
-        console.log(`Placeholders: ${placeholders}`);
         const [names] = await conn.query<AuthorResult[]>(
             `SELECT 姓名 AS name FROM teacher WHERE 姓名 IN (?)`,
             [authors]
