@@ -1,10 +1,16 @@
 'use client'; // 必须声明为客户端组件
 
-import { Layout, Menu, theme, Form, Input, DatePicker, Button } from 'antd';
+import { Layout, Menu, theme}  from 'antd';
 import { FileWordOutlined, ProjectOutlined , TeamOutlined , BarChartOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
+import PaperManagement from '@/components/paperManagement';
+import ProjectManagement from '@/components/projectManagement';
+import CourseManagement from '@/components/courseManagement';
+import Statistics from '@/components/statistics';
+
 const { Header, Content, Sider } = Layout;
+
 
 // 定义菜单项
 const menuItems = [
@@ -73,37 +79,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 
-function PaperManagement(){
-  const [form] = Form.useForm();
-  const config = {
-    rules: [{ type: 'object' as const, required: true, message: 'Please select time!' }],
-  };
-  return (
-    <Form
-      layout='vertical'
-      form={form}
-      style={{ maxWidth: 600 }}>
-      <Form.Item label="论文名称" name="title" required={true}>
-        <Input placeholder='输入论文名称'/>
-      </Form.Item>
-      <Form.Item label="发表源" name="source" required={true}>
-        <Input placeholder='输入论文发表源'/>
-      </Form.Item>
-      <Form.Item label="发表年份" name='发表年份' {...config}>
-        <DatePicker />
-      </Form.Item>
-    </Form>
-  );
-}
-
-function ProjectManagement(){
-  return <div>project management</div>;
-}
-
-function CourseManagement(){
-  return <div>course management</div>;
-}
-
-function Statistics(){
-  return <div>statistics</div>;
-}
