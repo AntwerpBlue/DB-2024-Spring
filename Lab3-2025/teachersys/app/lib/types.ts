@@ -45,3 +45,39 @@ export interface Course{
     year: number;
     semester: number;
 }
+
+export interface TeacherBasicInfo {
+  teacherId: string;
+  name: string;
+  gender: string;
+  position: string;
+}
+
+export interface CourseInfo {
+  key: string;
+  courseId: string;
+  courseName: string;
+  year: string;
+  semester: string;
+  hours: number;
+}
+
+export interface PaperInfo {
+  key: string;
+  paperTitle: string;
+  journalName: string;
+  publishDate: string;
+  rank: string;
+  correspond: boolean;
+}
+
+export interface ProjectInfo {
+  key: string;
+  projectId: string;
+  projectName: string;
+  projectType: string;
+  projectSource: string;
+  dateRange: string;
+  totalFunding: number;
+  funding: number;
+}
