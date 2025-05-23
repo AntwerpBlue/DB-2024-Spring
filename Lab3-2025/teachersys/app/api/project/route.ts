@@ -55,5 +55,13 @@ export async function POST(req: Request) {
         { error: 'Database Error' },
         { status: 500 }
         );
+    }finally{
+        if (conn) {
+            try {
+                conn.release();
+            } catch (releaseError) {
+                console.error('释放连接失败:', releaseError);
+            }
+        }
     }
 }

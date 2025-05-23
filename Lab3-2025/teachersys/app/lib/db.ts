@@ -11,7 +11,7 @@ export async function connectToDB() {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     waitForConnections: true,
-    connectionLimit: 3
+    connectionLimit: 5
   });
   
   return cachedPool;

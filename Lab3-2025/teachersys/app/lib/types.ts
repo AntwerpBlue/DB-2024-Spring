@@ -49,30 +49,31 @@ export interface Course{
 export interface TeacherBasicInfo {
   teacherId: string;
   name: string;
-  gender: string;
-  position: string;
+  gender: number;
+  position: number;
 }
 
 export interface CourseInfo {
-  key: string;
   courseId: string;
   courseName: string;
+  courseType: number;
   year: string;
   semester: string;
   hours: number;
 }
 
 export interface PaperInfo {
-  key: string;
+  paperId: string;
   paperTitle: string;
   journalName: string;
-  publishDate: string;
+  publishYear: string;
   rank: string;
+  paperType: number;
+  paperLevel: number;
   correspond: boolean;
 }
 
 export interface ProjectInfo {
-  key: string;
   projectId: string;
   projectName: string;
   projectType: string;
@@ -80,4 +81,12 @@ export interface ProjectInfo {
   dateRange: string;
   totalFunding: number;
   funding: number;
+}
+
+export interface staticResponse{
+    success: boolean;
+    teacherInfo?: TeacherBasicInfo;
+    projectInfo?: ProjectInfo[];
+    paperInfo?: PaperInfo[];
+    courseInfo?: CourseInfo[];
 }
